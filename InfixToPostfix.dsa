@@ -1,0 +1,120 @@
+import java.util.Scanner;
+
+public class InfixToPostfix {
+
+    static char[] stack = new char[100];
+    static int top = -1;
+
+    // Push operation
+    static void push(char ch) {
+        top++;
+        stack[top] = ch;
+    }
+
+    // Pop operation
+    static char pop() {
+        char ch = stack[top];
+        top--;
+        return ch;
+    }
+
+    // Peek operation
+    static char peek() {
+        return stack[top];
+    }
+
+    // Check operator precedence
+    static int precedence(char ch) {
+        switch (ch) {
+            case '+':
+            case '-':
+                return 1;
+
+            case '*':
+            case '/':
+                return 2;
+
+            case '^':
+                return 3;
+
+            default:
+                return 0;
+        }
+    }
+
+    // Check whether character is operator
+    static boolean isOperator(char ch) {
+        return ch == '+' || ch == '-' ||
+               ch == '*' || ch == '/' || ch == '^';
+    }
+
+    // Convert infix to postfix
+    static String infixToPostfix(String infix) {
+
+        String postfix = "";
+
+        for (int i = 0; i < infix.length(); i++) {
+
+            char ch = infix.charAt(i);
+
+            // If operand, add directly to postfix
+            if (Character.isLetterOrDigit(ch)) {
+                postfix = postfix + ch;
+            }
+
+            // If opening bracket
+            else if (ch == '(') {
+                push(ch);
+            }
+
+            // If closing bracket
+            else if (ch == ')') {
+
+                while (top != -1 && peek() != '(') {
+                    postfix = postfix + pop();
+                }
+
+                if (top != -1 && peek() == '(') {
+                    pop();
+                }
+            }
+
+            // If operator
+            else if (isOperator(ch)) {
+
+                while (top != -1 &&
+                       peek() != '(' &&
+                       precedence(peek()) >= precedence(ch)) {
+
+                    postfix = postfix + pop();
+                }
+
+                push(ch);
+            }
+        }
+
+        // Pop remaining operators
+        while (top != -1) {
+            postfix = postfix + pop();
+        }
+
+        return postfix;
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("===== INFIX TO POSTFIX CONVERSION =====");
+
+        System.out.print("Enter infix expression: ");
+        String infix = sc.nextLine();
+
+        String postfix = infixToPostfix(infix);
+
+        System.out.println("Infix Expression: " + infix);
+        System.out.println("Postfix Expression: " + postfix);
+
+        sc.close();
+    }
+}
